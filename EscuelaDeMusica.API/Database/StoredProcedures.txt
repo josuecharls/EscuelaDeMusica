@@ -1,0 +1,142 @@
+﻿CREATE PROCEDURE usp_InsertarEscuela
+    @Codigo NVARCHAR(10),
+    @Nombre NVARCHAR(100),
+    @Descripcion NVARCHAR(250)
+AS
+BEGIN
+    INSERT INTO Escuelas (Codigo, Nombre, Descripcion)
+    VALUES (@Codigo, @Nombre, @Descripcion)
+END
+
+CREATE PROCEDURE usp_ActualizarEscuela
+    @Id INT,
+    @Codigo NVARCHAR(10),
+    @Nombre NVARCHAR(100),
+    @Descripcion NVARCHAR(250)
+AS
+BEGIN
+    UPDATE Escuelas
+    SET Codigo = @Codigo,
+        Nombre = @Nombre,
+        Descripcion = @Descripcion
+    WHERE Id = @Id
+END
+
+CREATE PROCEDURE usp_EliminarEscuela
+    @Id INT
+AS
+BEGIN
+    DELETE FROM Escuelas WHERE Id = @Id
+END
+
+CREATE PROCEDURE usp_ListarEscuelas
+AS
+BEGIN
+    SELECT * FROM Escuelas
+END
+
+CREATE PROCEDURE usp_InsertarProfesor
+    @Nombre NVARCHAR(100),
+    @Apellido NVARCHAR(100),
+    @Identificacion NVARCHAR(20),
+    @EscuelaId INT
+AS
+BEGIN
+    INSERT INTO Profesores (Nombre, Apellido, Identificacion, EscuelaId)
+    VALUES (@Nombre, @Apellido, @Identificacion, @EscuelaId)
+END
+
+CREATE PROCEDURE usp_ActualizarProfesor
+    @Id INT,
+    @Nombre NVARCHAR(100),
+    @Apellido NVARCHAR(100),
+    @Identificacion NVARCHAR(20),
+    @EscuelaId INT
+AS
+BEGIN
+    UPDATE Profesores
+    SET Nombre = @Nombre,
+        Apellido = @Apellido,
+        Identificacion = @Identificacion,
+        EscuelaId = @EscuelaId
+    WHERE Id = @Id
+END
+
+CREATE PROCEDURE usp_EliminarProfesor
+    @Id INT
+AS
+BEGIN
+    DELETE FROM Profesores WHERE Id = @Id
+END
+
+CREATE PROCEDURE usp_ListarProfesores
+AS
+BEGIN
+    SELECT * FROM Profesores
+END
+
+CREATE PROCEDURE usp_InsertarAlumno
+    @Nombre NVARCHAR(100),
+    @Apellido NVARCHAR(100),
+    @FechaNacimiento DATE,
+    @Identificacion NVARCHAR(20),
+    @EscuelaId INT
+AS
+BEGIN
+    INSERT INTO Alumnos (Nombre, Apellido, FechaNacimiento, Identificacion, EscuelaId)
+    VALUES (@Nombre, @Apellido, @FechaNacimiento, @Identificacion, @EscuelaId)
+END
+
+CREATE PROCEDURE usp_ActualizarAlumno
+    @Id INT,
+    @Nombre NVARCHAR(100),
+    @Apellido NVARCHAR(100),
+    @FechaNacimiento DATE,
+    @Identificacion NVARCHAR(20),
+    @EscuelaId INT
+AS
+BEGIN
+    UPDATE Alumnos
+    SET Nombre = @Nombre,
+        Apellido = @Apellido,
+        FechaNacimiento = @FechaNacimiento,
+        Identificacion = @Identificacion,
+        EscuelaId = @EscuelaId
+    WHERE Id = @Id
+END
+
+CREATE PROCEDURE usp_EliminarAlumno
+    @Id INT
+AS
+BEGIN
+    DELETE FROM Alumnos WHERE Id = @Id
+END
+
+CREATE PROCEDURE usp_ListarAlumnos
+AS
+BEGIN
+    SELECT * FROM Alumnos
+END
+
+CREATE PROCEDURE usp_AlumnosPorProfesor
+    @ProfesorId INT
+AS
+BEGIN
+    SELECT a.Id, a.Nombre, a.Apellido, e.Nombre AS Escuela
+    FROM AlumnoProfesor ap
+    JOIN Alumnos a ON ap.AlumnoId = a.Id
+    JOIN Escuelas e ON a.EscuelaId = e.Id
+    WHERE ap.ProfesorId = @ProfesorId
+END
+
+CREATE PROCEDURE usp_EscuelaYAlumnosPorProfesor
+    @ProfesorId INT
+AS
+BEGIN
+    SELECT DISTINCT e.Id, e.Nombre, e.Descripcion, a.Id AS AlumnoId, a.Nombre AS AlumnoNombre
+    FROM Profesores p
+    JOIN Escuelas e ON p.EscuelaId = e.Id
+    JOIN AlumnoProfesor ap ON ap.ProfesorId = p.Id
+    JOIN Alumnos a ON ap.AlumnoId = a.Id
+    WHERE p.Id = @ProfesorId
+END
