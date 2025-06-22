@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using EscuelaDeMusica.API.DTOs;
 using EscuelaDeMusica.API.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace EscuelaDeMusica.API.Controllers
 {
@@ -22,14 +23,39 @@ namespace EscuelaDeMusica.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Escuela>> GetEscuela(int id)
+        public async Task<ActionResult<EscuelaDetalleDTO>> GetEscuela(int id)
         {
-            var escuela = await _context.Escuelas.FindAsync(id);
+            var escuela = await _context.Escuelas
+                .Include(e => e.Alumnos)
+                .Include(e => e.Profesores)
+                .FirstOrDefaultAsync(e => e.Id == id);
+
             if (escuela == null)
-            {
                 return NotFound();
-            }
-            return escuela;
+
+            var dto = new EscuelaDetalleDTO
+            {
+                Id = escuela.Id,
+                Codigo = escuela.Codigo,
+                Nombre = escuela.Nombre,
+                Descripcion = escuela.Descripcion,
+                Alumnos = escuela.Alumnos.Select(a => new AlumnoDTO
+                {
+                    Id = a.Id,
+                    Nombre = a.Nombre,
+                    Apellido = a.Apellido,
+                    Identificacion = a.Identificacion
+                }).ToList(),
+                Profesores = escuela.Profesores.Select(p => new ProfesorDTO
+                {
+                    Id = p.Id,
+                    Nombre = p.Nombre,
+                    Apellido = p.Apellido,
+                    Identificacion = p.Identificacion
+                }).ToList()
+            };
+
+            return dto;
         }
 
         [HttpPost]

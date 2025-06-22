@@ -1,6 +1,0 @@
-@ExamenEscuelaDeMusica.API_HostAddress = http://localhost:5296
-
-GET {{ExamenEscuelaDeMusica.API_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

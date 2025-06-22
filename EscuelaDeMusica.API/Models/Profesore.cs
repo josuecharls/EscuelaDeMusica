@@ -15,7 +15,7 @@ public partial class Profesore
 
     public int EscuelaId { get; set; }
 
-    public virtual Escuela Escuela { get; set; } = null!;
+    public virtual Escuela? Escuela { get; set; }
 
     public virtual ICollection<Alumno> Alumnos { get; set; } = new List<Alumno>();
 }
