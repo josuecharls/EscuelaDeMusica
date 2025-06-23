@@ -21,45 +21,59 @@ namespace EscuelaDeMusica.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Profesore>>> ListarProfesores()
         {
-            var profesores = await _context.Profesores
-                .FromSqlRaw("EXEC usp_ListarProfesores")
-                .AsNoTracking()
-                .ToListAsync();
-
-            foreach (var profe in profesores)
+            try
             {
-                profe.Escuela = await _context.Escuelas.FindAsync(profe.EscuelaId);
-            }
+                var profesores = await _context.Profesores
+                    .FromSqlRaw("EXEC usp_ListarProfesores")
+                    .AsNoTracking()
+                    .ToListAsync();
 
-            return profesores;
+                foreach (var profe in profesores)
+                {
+                    profe.Escuela = await _context.Escuelas.FindAsync(profe.EscuelaId);
+                }
+
+                return profesores;
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensaje = "Error al obtener los profesores.", detalle = ex.Message });
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ProfesorDetalleDTO>> ProfesorPorID(int id)
         {
-            var profesor = await _context.Profesores
-                .Include(p => p.Escuela)
-                .Include(p => p.Alumnos)
-                .FirstOrDefaultAsync(p => p.Id == id);
-            if (profesor == null)
-                return NotFound();
-
-            var dto = new ProfesorDetalleDTO
+            try
             {
-                Id = profesor.Id,
-                Nombre = profesor.Nombre,
-                Apellido = profesor.Apellido,
-                Identificacion = profesor.Identificacion,
-                EscuelaId = profesor.EscuelaId,
-                EscuelaNombre = profesor.Escuela?.Nombre ?? "",
-                Alumnos = profesor.Alumnos.Select(p => new AlumnosProfDto
+                var profesor = await _context.Profesores
+                    .Include(p => p.Escuela)
+                    .Include(p => p.Alumnos)
+                    .FirstOrDefaultAsync(p => p.Id == id);
+                if (profesor == null)
+                    return NotFound();
+
+                var dto = new ProfesorDetalleDTO
                 {
-                    Id = p.Id,
-                    Nombre = p.Nombre,
-                    Apellido = p.Apellido
-                }).ToList(),
-            };
-            return dto;
+                    Id = profesor.Id,
+                    Nombre = profesor.Nombre,
+                    Apellido = profesor.Apellido,
+                    Identificacion = profesor.Identificacion,
+                    EscuelaId = profesor.EscuelaId,
+                    EscuelaNombre = profesor.Escuela?.Nombre ?? "",
+                    Alumnos = profesor.Alumnos.Select(p => new AlumnosProfDto
+                    {
+                        Id = p.Id,
+                        Nombre = p.Nombre,
+                        Apellido = p.Apellido
+                    }).ToList(),
+                };
+                return dto;
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensaje = "Error al obtener el profesor.", detalle = ex.Message });
+            }
         }
 
         [HttpPost]
@@ -120,95 +134,128 @@ namespace EscuelaDeMusica.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> EliminarProfesor(int id)
         {
-            if (!await _context.Profesores.AnyAsync(p => p.Id == id))
-                return NotFound(new { mensaje = "Profesor no encontrado." });
+            try
+            {
+                if (!await _context.Profesores.AnyAsync(p => p.Id == id))
+                    return NotFound(new { mensaje = "Profesor no encontrado." });
 
-            await _context.Database.ExecuteSqlInterpolatedAsync($"EXEC usp_EliminarProfesor @Id={id}");
+                await _context.Database.ExecuteSqlInterpolatedAsync($"EXEC usp_EliminarProfesor @Id={id}");
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensaje = "Error al eliminar el profesor.", detalle = ex.Message });
+            }
         }
 
         [HttpPost("{id}/alumnos")]
         public async Task<IActionResult> AsignarAlumnos(int id, List<int> alumnoIds)
         {
-            var profesor = await _context.Profesores.Include(p => p.Alumnos).FirstOrDefaultAsync(p => p.Id == id);
-            if (profesor == null)
-                return NotFound(new { mensaje = "Profesor no encontrado." });
-
-            var alumnos = await _context.Alumnos
-                .Where(a => alumnoIds.Contains(a.Id))
-                .ToListAsync();
-
-            if (alumnos.Count != alumnoIds.Count)
-                return BadRequest(new { mensaje = "Uno o más alumnos no existen." });
-
-            if (alumnos.Any(a => a.EscuelaId != profesor.EscuelaId))
-                return BadRequest(new { mensaje = "Todos los alumnos deben pertenecer a la misma escuela que el profesor." });
-
-            foreach (var alumno in alumnos)
+            try
             {
-                if (!profesor.Alumnos.Any(a => a.Id == alumno.Id))
-                    profesor.Alumnos.Add(alumno);
+                var profesor = await _context.Profesores.Include(p => p.Alumnos).FirstOrDefaultAsync(p => p.Id == id);
+                if (profesor == null)
+                    return NotFound(new { mensaje = "Profesor no encontrado." });
+
+                var alumnos = await _context.Alumnos
+                    .Where(a => alumnoIds.Contains(a.Id))
+                    .ToListAsync();
+
+                if (alumnos.Count != alumnoIds.Count)
+                    return BadRequest(new { mensaje = "Uno o más alumnos no existen." });
+
+                if (alumnos.Any(a => a.EscuelaId != profesor.EscuelaId))
+                    return BadRequest(new { mensaje = "Todos los alumnos deben pertenecer a la misma escuela que el profesor." });
+
+                foreach (var alumno in alumnos)
+                {
+                    if (!profesor.Alumnos.Any(a => a.Id == alumno.Id))
+                        profesor.Alumnos.Add(alumno);
+                }
+
+                await _context.SaveChangesAsync();
+
+                return NoContent();
             }
-
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensaje = "Error al asignar alumnos.", detalle = ex.Message });
+            }
         }
 
         [HttpGet("{id}/alumnos")]
         public async Task<ActionResult<IEnumerable<AlumnoConEscuelaDTO>>> GetAlumnosPorProfesor(int id)
         {
-            var resultado = new List<AlumnoConEscuelaDTO>();
-            using var connection = _context.Database.GetDbConnection();
-            await connection.OpenAsync();
-            using var command = connection.CreateCommand();
-            command.CommandText = "usp_AlumnosPorProfesor";
-            command.CommandType = System.Data.CommandType.StoredProcedure;
-            var param = command.CreateParameter();
-            param.ParameterName = "@ProfesorId";
-            param.Value = id;
-            command.Parameters.Add(param);
-            using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
+            try
             {
-                resultado.Add(new AlumnoConEscuelaDTO
+                // Validar existencia del profesor
+                var existeProfesor = await _context.Profesores.AnyAsync(p => p.Id == id);
+                if (!existeProfesor)
+                    return NotFound(new { mensaje = "El ID del profesor consultado no ha sido creado." });
+
+                var resultado = new List<AlumnoConEscuelaDTO>();
+                using var connection = _context.Database.GetDbConnection();
+                await connection.OpenAsync();
+                using var command = connection.CreateCommand();
+                command.CommandText = "usp_AlumnosPorProfesor";
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+                var param = command.CreateParameter();
+                param.ParameterName = "@ProfesorId";
+                param.Value = id;
+                command.Parameters.Add(param);
+                using var reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
                 {
-                    Id = reader.GetInt32(0),
-                    Nombre = reader.GetString(1),
-                    Apellido = reader.GetString(2),
-                    Escuela = reader.GetString(3)
-                });
+                    resultado.Add(new AlumnoConEscuelaDTO
+                    {
+                        Id = reader.GetInt32(0),
+                        Nombre = reader.GetString(1),
+                        Apellido = reader.GetString(2),
+                        Escuela = reader.GetString(3)
+                    });
+                }
+                return resultado;
             }
-            return resultado;
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensaje = "Error al obtener los alumnos.", detalle = ex.Message });
+            }
         }
 
         [HttpGet("{id}/escuela-alumnos")]
         public async Task<ActionResult<IEnumerable<EscuelaConAlumnoDTO>>> GetEscuelaYAlumnos(int id)
         {
-            var resultado = new List<EscuelaConAlumnoDTO>();
-            using var connection = _context.Database.GetDbConnection();
-            await connection.OpenAsync();
-            using var command = connection.CreateCommand();
-            command.CommandText = "usp_EscuelaYAlumnosPorProfesor";
-            command.CommandType = System.Data.CommandType.StoredProcedure;
-            var param = command.CreateParameter();
-            param.ParameterName = "@ProfesorId";
-            param.Value = id;
-            command.Parameters.Add(param);
-            using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
+            try
             {
-                resultado.Add(new EscuelaConAlumnoDTO
+                var resultado = new List<EscuelaConAlumnoDTO>();
+                using var connection = _context.Database.GetDbConnection();
+                await connection.OpenAsync();
+                using var command = connection.CreateCommand();
+                command.CommandText = "usp_EscuelaYAlumnosPorProfesor";
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+                var param = command.CreateParameter();
+                param.ParameterName = "@ProfesorId";
+                param.Value = id;
+                command.Parameters.Add(param);
+                using var reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
                 {
-                    Id = reader.GetInt32(0),
-                    Nombre = reader.GetString(1),
-                    Descripcion = reader.GetString(2),
-                    AlumnoId = reader.GetInt32(3),
-                    AlumnoNombre = reader.GetString(4)
-                });
+                    resultado.Add(new EscuelaConAlumnoDTO
+                    {
+                        Id = reader.GetInt32(0),
+                        Nombre = reader.GetString(1),
+                        Descripcion = reader.GetString(2),
+                        AlumnoId = reader.GetInt32(3),
+                        AlumnoNombre = reader.GetString(4)
+                    });
+                }
+                return resultado;
             }
-            return resultado;
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensaje = "Error al obtener la escuela y alumnos.", detalle = ex.Message });
+            }
         }
     }
 }
