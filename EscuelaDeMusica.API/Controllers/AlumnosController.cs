@@ -32,6 +32,7 @@ public class AlumnosController : ControllerBase
 
         return alumnos;
     }
+
     [HttpGet("{id}")]
     public async Task<ActionResult<AlumnoDetalleDTO>> AlumnoPorID(int id)
     {
@@ -61,8 +62,27 @@ public class AlumnosController : ControllerBase
     {
         if (await _context.Alumnos.AnyAsync(a => a.Identificacion == alumno.Identificacion))
             return Conflict("La identificación ya existe");
-
-        await _context.Database.ExecuteSqlInterpolatedAsync($"EXEC usp_InsertarAlumno @Nombre={alumno.Nombre}, @Apellido={alumno.Apellido}, @FechaNacimiento={alumno.FechaNacimiento.ToDateTime(TimeOnly.MinValue)}, @Identificacion={alumno.Identificacion}, @EscuelaId={alumno.EscuelaId}");
+        
+        try
+        {
+            // Ejecutar el SP de inserción
+            await _context.Database.ExecuteSqlInterpolatedAsync($@"
+            EXEC usp_InsertarAlumno 
+                @Nombre={alumno.Nombre}, 
+                @Apellido={alumno.Apellido}, 
+                @FechaNacimiento={alumno.FechaNacimiento.ToDateTime(TimeOnly.MinValue)}, 
+                @Identificacion={alumno.Identificacion}, 
+                @EscuelaId={alumno.EscuelaId}
+        ");
+        }
+        catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("FOREIGN KEY") == true)
+        {
+            return BadRequest("No se puede insertar el alumno porque la escuela indicada no existe.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error inesperado: {ex.Message}");
+        }
 
         var creado = await _context.Alumnos.FirstOrDefaultAsync(a => a.Identificacion == alumno.Identificacion);
         return CreatedAtAction(nameof(AlumnoPorID), new { id = creado!.Id }, creado);

@@ -73,7 +73,7 @@ namespace EscuelaDeMusica.API.Controllers
         {
             if (await _context.Escuelas.AnyAsync(e => e.Codigo == escuela.Codigo))
             {
-                return Conflict("El codigo ya existe");
+                return Conflict("El codigo de esta Escuela ya existe");
             }
             _context.Escuelas.Add(escuela);
             await _context.SaveChangesAsync();
@@ -89,7 +89,7 @@ namespace EscuelaDeMusica.API.Controllers
             escuela.Id = id;
 
             if (await _context.Escuelas.AnyAsync(e => e.Id != id && e.Codigo == escuela.Codigo))
-                return Conflict("Ya existe otra escuela con ese código.");
+                return Conflict("Ya existe otra escuela con ese código");
 
             _context.Entry(escuelaExistente).CurrentValues.SetValues(escuela);
             await _context.SaveChangesAsync();

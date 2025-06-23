@@ -1,64 +1,319 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
-    <title>Prueba API Profesores</title>
+    <title>Prueba API Escuela de Música</title>
 </head>
 <body>
-    <h2>Asignar alumnos a profesor</h2>
-    <label>ID del Profesor:</label><br />
-    <input id="profesorIdPost" type="number" /><br />
-    <label>IDs de alumnos (separados por coma):</label><br />
-    <input id="alumnoIds" type="text" /><br />
-    <button onclick="asignarAlumnos()">Asignar</button>
-    <pre id="resultadoPost"></pre>
+    <h1>Pruebas de Endpoints</h1>
+
+    <h2>Escuelas</h2>
+    <button onclick="listarEscuelas()">Listar Escuelas</button>
+    <pre id="escuelasList"></pre>
+
+    <div>
+        <label>ID:</label>
+        <input id="escuelaIdGet" type="number" />
+        <button onclick="obtenerEscuela()">Obtener</button>
+        <pre id="escuelaGet"></pre>
+    </div>
+    <div>
+        <h3>Crear Escuela</h3>
+        <label>Código:</label><input id="escuelaCodigo" type="text" />
+        <label>Nombre:</label><input id="escuelaNombre" type="text" />
+        <label>Descripción:</label><input id="escuelaDescripcion" type="text" />
+        <button onclick="crearEscuela()">Crear</button>
+        <pre id="escuelaCreate"></pre>
+    </div>
+    <div>
+        <h3>Editar Escuela</h3>
+        <label>ID:</label><input id="escuelaIdPut" type="number" />
+        <label>Código:</label><input id="escuelaCodigoPut" type="text" />
+        <label>Nombre:</label><input id="escuelaNombrePut" type="text" />
+        <label>Descripción:</label><input id="escuelaDescripcionPut" type="text" />
+        <button onclick="editarEscuela()">Editar</button>
+        <pre id="escuelaEdit"></pre>
+    </div>
+    <div>
+        <h3>Eliminar Escuela</h3>
+        <label>ID:</label><input id="escuelaIdDelete" type="number" />
+        <button onclick="eliminarEscuela()">Eliminar</button>
+        <pre id="escuelaDelete"></pre>
+    </div>
 
     <hr />
 
-    <h2>Ver alumnos de un profesor</h2>
-    <label>ID del Profesor:</label><br />
-    <input id="profesorIdGet1" type="number" /><br />
-    <button onclick="verAlumnos()">Ver alumnos</button>
-    <pre id="resultadoGet1"></pre>
+    <h2>Profesores</h2>
+    <button onclick="listarProfesores()">Listar Profesores</button>
+    <pre id="profesoresList"></pre>
+
+    <div>
+        <label>ID:</label>
+        <input id="profesorIdGet" type="number" />
+        <button onclick="obtenerProfesor()">Obtener</button>
+        <pre id="profesorGet"></pre>
+    </div>
+    <div>
+        <h3>Crear Profesor</h3>
+        <label>Nombre:</label><input id="profesorNombre" type="text" />
+        <label>Apellido:</label><input id="profesorApellido" type="text" />
+        <label>Identificación:</label><input id="profesorIdentificacion" type="text" />
+        <label>EscuelaId:</label><input id="profesorEscuelaId" type="number" />
+        <button onclick="crearProfesor()">Crear</button>
+        <pre id="profesorCreate"></pre>
+    </div>
+    <div>
+        <h3>Editar Profesor</h3>
+        <label>ID:</label><input id="profesorIdPut" type="number" />
+        <label>Nombre:</label><input id="profesorNombrePut" type="text" />
+        <label>Apellido:</label><input id="profesorApellidoPut" type="text" />
+        <label>Identificación:</label><input id="profesorIdentificacionPut" type="text" />
+        <label>EscuelaId:</label><input id="profesorEscuelaIdPut" type="number" />
+        <button onclick="editarProfesor()">Editar</button>
+        <pre id="profesorEdit"></pre>
+    </div>
+    <div>
+        <h3>Eliminar Profesor</h3>
+        <label>ID:</label><input id="profesorIdDelete" type="number" />
+        <button onclick="eliminarProfesor()">Eliminar</button>
+        <pre id="profesorDelete"></pre>
+    </div>
+    <div>
+        <h3>Asignar alumnos a profesor</h3>
+        <label>ID del Profesor:</label><input id="profesorIdPost" type="number" />
+        <label>IDs de alumnos (separados por coma):</label><input id="alumnoIds" type="text" />
+        <button onclick="asignarAlumnos()">Asignar</button>
+        <pre id="resultadoPost"></pre>
+    </div>
+    <div>
+        <h3>Ver alumnos de un profesor</h3>
+        <label>ID del Profesor:</label><input id="profesorIdGet1" type="number" />
+        <button onclick="verAlumnos()">Ver alumnos</button>
+        <pre id="resultadoGet1"></pre>
+    </div>
+    <div>
+        <h3>Escuela y alumnos del profesor</h3>
+        <label>ID del Profesor:</label><input id="profesorIdGet2" type="number" />
+        <button onclick="verEscuelaAlumnos()">Ver escuela y alumnos</button>
+        <pre id="resultadoGet2"></pre>
+    </div>
 
     <hr />
 
-    <h2>Escuela y alumnos del profesor</h2>
-    <label>ID del Profesor:</label><br />
-    <input id="profesorIdGet2" type="number" /><br />
-    <button onclick="verEscuelaAlumnos()">Ver escuela y alumnos</button>
-    <pre id="resultadoGet2"></pre>
+    <h2>Alumnos</h2>
+    <button onclick="listarAlumnos()">Listar Alumnos</button>
+    <pre id="alumnosList"></pre>
+
+    <div>
+        <label>ID:</label>
+        <input id="alumnoIdGet" type="number" />
+        <button onclick="obtenerAlumno()">Obtener</button>
+        <pre id="alumnoGet"></pre>
+    </div>
+    <div>
+        <h3>Crear Alumno</h3>
+        <label>Nombre:</label><input id="alumnoNombre" type="text" />
+        <label>Apellido:</label><input id="alumnoApellido" type="text" />
+        <label>Fecha Nacimiento:</label><input id="alumnoFecha" type="date" />
+        <label>Identificación:</label><input id="alumnoIdentificacion" type="text" />
+        <label>EscuelaId:</label><input id="alumnoEscuelaId" type="number" />
+        <button onclick="crearAlumno()">Crear</button>
+        <pre id="alumnoCreate"></pre>
+    </div>
+    <div>
+        <h3>Editar Alumno</h3>
+        <label>ID:</label><input id="alumnoIdPut" type="number" />
+        <label>Nombre:</label><input id="alumnoNombrePut" type="text" />
+        <label>Apellido:</label><input id="alumnoApellidoPut" type="text" />
+        <label>Fecha Nacimiento:</label><input id="alumnoFechaPut" type="date" />
+        <label>Identificación:</label><input id="alumnoIdentificacionPut" type="text" />
+        <label>EscuelaId:</label><input id="alumnoEscuelaIdPut" type="number" />
+        <button onclick="editarAlumno()">Editar</button>
+        <pre id="alumnoEdit"></pre>
+    </div>
+    <div>
+        <h3>Eliminar Alumno</h3>
+        <label>ID:</label><input id="alumnoIdDelete" type="number" />
+        <button onclick="eliminarAlumno()">Eliminar</button>
+        <pre id="alumnoDelete"></pre>
+    </div>
 
     <script>
-    const baseUrl = "http://localhost:5273/api/Profesores";
+        const api = 'http://localhost:5273/api';
 
-    async function asignarAlumnos() {
-      const id = document.getElementById("profesorIdPost").value;
-      const alumnosRaw = document.getElementById("alumnoIds").value;
-      const alumnoIds = alumnosRaw.split(",").map(s => parseInt(s.trim()));
-      const res = await fetch(`${baseUrl}/${id}/alumnos`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(alumnoIds)
-      });
-      document.getElementById("resultadoPost").textContent = res.status === 204
-        ? "✅ Asignación exitosa"
-        : `❌ Error: ${res.status}`;
-    }
+            // mostramos el resultado
+            function mostrar(id, data) {
+                document.getElementById(id).textContent =
+                    typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+            }
 
-    async function verAlumnos() {
-      const id = document.getElementById("profesorIdGet1").value;
-      const res = await fetch(`${baseUrl}/${id}/alumnos`);
-      const data = await res.json();
-      document.getElementById("resultadoGet1").textContent = JSON.stringify(data, null, 2);
-    }
+                // Escuelas
+                async function listarEscuelas() {
+                    const res = await fetch(`${api}/Escuelas`);
+                    const data = await res.json();
+                    mostrar('escuelasList', data);
+                }
+                async function obtenerEscuela() {
+                    const id = document.getElementById('escuelaIdGet').value;
+                    const res = await fetch(`${api}/Escuelas/${id}`);
+                    const data = await res.json();
+                    mostrar('escuelaGet', data);
+                }
+                async function crearEscuela() {
+                    const body = {
+                        Codigo: document.getElementById('escuelaCodigo').value,
+                        Nombre: document.getElementById('escuelaNombre').value,
+                        Descripcion: document.getElementById('escuelaDescripcion').value
+                    };
+                    const res = await fetch(`${api}/Escuelas`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                    });
+                    mostrar('escuelaCreate', await res.json());
+                }
+                async function editarEscuela() {
+                    const id = document.getElementById('escuelaIdPut').value;
+                    const body = {
+                        Id: parseInt(id),
+                        Codigo: document.getElementById('escuelaCodigoPut').value,
+                        Nombre: document.getElementById('escuelaNombrePut').value,
+                        Descripcion: document.getElementById('escuelaDescripcionPut').value
+                    };
+                    const res = await fetch(`${api}/Escuelas/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                    });
+                    mostrar('escuelaEdit', res.status === 204 ? 'Hecho' : `Error ${res.status}`);
+                }
+                async function eliminarEscuela() {
+                    const id = document.getElementById('escuelaIdDelete').value;
+                    const res = await fetch(`${api}/Escuelas/${id}`, { method: 'DELETE' });
+                    mostrar('escuelaDelete', res.status === 204 ? 'Hecho' : `Error ${res.status}`);
+                }
 
-    async function verEscuelaAlumnos() {
-      const id = document.getElementById("profesorIdGet2").value;
-      const res = await fetch(`${baseUrl}/${id}/escuela-alumnos`);
-      const data = await res.json();
-      document.getElementById("resultadoGet2").textContent = JSON.stringify(data, null, 2);
-    }
+                // Profesores
+                async function listarProfesores() {
+                    const res = await fetch(`${api}/Profesores`);
+                    const data = await res.json();
+                    mostrar('profesoresList', data);
+                }
+                async function obtenerProfesor() {
+                    const id = document.getElementById('profesorIdGet').value;
+                    const res = await fetch(`${api}/Profesores/${id}`);
+                    const data = await res.json();
+                    mostrar('profesorGet', data);
+                }
+                async function crearProfesor() {
+                    const body = {
+                        Nombre: document.getElementById('profesorNombre').value,
+                        Apellido: document.getElementById('profesorApellido').value,
+                        Identificacion: document.getElementById('profesorIdentificacion').value,
+                        EscuelaId: parseInt(document.getElementById('profesorEscuelaId').value)
+                    };
+                    const res = await fetch(`${api}/Profesores`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                    });
+                    mostrar('profesorCreate', await res.json());
+                }
+                async function editarProfesor() {
+                    const id = document.getElementById('profesorIdPut').value;
+                    const body = {
+                        Id: parseInt(id),
+                        Nombre: document.getElementById('profesorNombrePut').value,
+                        Apellido: document.getElementById('profesorApellidoPut').value,
+                        Identificacion: document.getElementById('profesorIdentificacionPut').value,
+                        EscuelaId: parseInt(document.getElementById('profesorEscuelaIdPut').value)
+                    };
+                    const res = await fetch(`${api}/Profesores/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                    });
+                    mostrar('profesorEdit', res.status === 204 ? 'Hecho' : `Error ${res.status}`);
+                }
+                async function eliminarProfesor() {
+                    const id = document.getElementById('profesorIdDelete').value;
+                    const res = await fetch(`${api}/Profesores/${id}`, { method: 'DELETE' });
+                    mostrar('profesorDelete', res.status === 204 ? 'Hecho' : `Error ${res.status}`);
+                }
+                async function asignarAlumnos() {
+                    const id = document.getElementById('profesorIdPost').value;
+                    const alumnosRaw = document.getElementById('alumnoIds').value;
+                    const alumnoIds = alumnosRaw.split(',').map(s => parseInt(s.trim()));
+                    const res = await fetch(`${api}/Profesores/${id}/alumnos`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(alumnoIds)
+                    });
+                    mostrar('resultadoPost', res.status === 204 ? 'Hecho' : `Error ${res.status}`);
+                }
+                async function verAlumnos() {
+                    const id = document.getElementById('profesorIdGet1').value;
+                    const res = await fetch(`${api}/Profesores/${id}/alumnos`);
+                    const data = await res.json();
+                    mostrar('resultadoGet1', data);
+                }
+                async function verEscuelaAlumnos() {
+                    const id = document.getElementById('profesorIdGet2').value;
+                    const res = await fetch(`${api}/Profesores/${id}/escuela-alumnos`);
+                    const data = await res.json();
+                    mostrar('resultadoGet2', data);
+                }
+
+                // Alumnos
+                async function listarAlumnos() {
+                    const res = await fetch(`${api}/Alumnos`);
+                    const data = await res.json();
+                    mostrar('alumnosList', data);
+                }
+                async function obtenerAlumno() {
+                    const id = document.getElementById('alumnoIdGet').value;
+                    const res = await fetch(`${api}/Alumnos/${id}`);
+                    const data = await res.json();
+                    mostrar('alumnoGet', data);
+                }
+                async function crearAlumno() {
+                    const body = {
+                        Nombre: document.getElementById('alumnoNombre').value,
+                        Apellido: document.getElementById('alumnoApellido').value,
+                        FechaNacimiento: document.getElementById('alumnoFecha').value,
+                        Identificacion: document.getElementById('alumnoIdentificacion').value,
+                        EscuelaId: parseInt(document.getElementById('alumnoEscuelaId').value)
+                    };
+                    const res = await fetch(`${api}/Alumnos`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                    });
+                    mostrar('alumnoCreate', await res.json());
+                }
+                async function editarAlumno() {
+                    const id = document.getElementById('alumnoIdPut').value;
+                    const body = {
+                        Id: parseInt(id),
+                        Nombre: document.getElementById('alumnoNombrePut').value,
+                        Apellido: document.getElementById('alumnoApellidoPut').value,
+                        FechaNacimiento: document.getElementById('alumnoFechaPut').value,
+                        Identificacion: document.getElementById('alumnoIdentificacionPut').value,
+                        EscuelaId: parseInt(document.getElementById('alumnoEscuelaIdPut').value)
+                    };
+                    const res = await fetch(`${api}/Alumnos/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                    });
+                    mostrar('alumnoEdit', res.status === 204 ? 'Hecho' : `Error ${res.status}`);
+                }
+                async function eliminarAlumno() {
+                    const id = document.getElementById('alumnoIdDelete').value;
+                    const res = await fetch(`${api}/Alumnos/${id}`, { method: 'DELETE' });
+                    mostrar('alumnoDelete', res.status === 204 ? 'Hecho' : `Error ${res.status}`);
+                }
     </script>
 </body>
 </html>
