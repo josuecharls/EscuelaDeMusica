@@ -17,9 +17,19 @@ namespace EscuelaDeMusica.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Escuela>>> ListarEscuelas()
+        public async Task<ActionResult<IEnumerable<EscuelaDetalleDTO>>> ListarEscuelas()
         {
-            return await _context.Escuelas.ToListAsync();
+            var escuelas = await _context.Escuelas
+                .Select(e => new EscuelaDetalleDTO
+                {
+                    Id = e.Id,
+                    Codigo = e.Codigo,
+                    Nombre = e.Nombre,
+                    Descripcion = e.Descripcion
+                })
+                .ToListAsync();
+
+            return escuelas;
         }
 
         [HttpGet("{id}")]

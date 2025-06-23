@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Prueba API Profesores</title>
+</head>
+<body>
+    <h2>Asignar alumnos a profesor</h2>
+    <label>ID del Profesor:</label><br />
+    <input id="profesorIdPost" type="number" /><br />
+    <label>IDs de alumnos (separados por coma):</label><br />
+    <input id="alumnoIds" type="text" /><br />
+    <button onclick="asignarAlumnos()">Asignar</button>
+    <pre id="resultadoPost"></pre>
+
+    <hr />
+
+    <h2>Ver alumnos de un profesor</h2>
+    <label>ID del Profesor:</label><br />
+    <input id="profesorIdGet1" type="number" /><br />
+    <button onclick="verAlumnos()">Ver alumnos</button>
+    <pre id="resultadoGet1"></pre>
+
+    <hr />
+
+    <h2>Escuela y alumnos del profesor</h2>
+    <label>ID del Profesor:</label><br />
+    <input id="profesorIdGet2" type="number" /><br />
+    <button onclick="verEscuelaAlumnos()">Ver escuela y alumnos</button>
+    <pre id="resultadoGet2"></pre>
+
+    <script>
+    const baseUrl = "http://localhost:5273/api/Profesores";
+
+    async function asignarAlumnos() {
+      const id = document.getElementById("profesorIdPost").value;
+      const alumnosRaw = document.getElementById("alumnoIds").value;
+      const alumnoIds = alumnosRaw.split(",").map(s => parseInt(s.trim()));
+      const res = await fetch(`${baseUrl}/${id}/alumnos`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(alumnoIds)
+      });
+      document.getElementById("resultadoPost").textContent = res.status === 204
+        ? "✅ Asignación exitosa"
+        : `❌ Error: ${res.status}`;
+    }
+
+    async function verAlumnos() {
+      const id = document.getElementById("profesorIdGet1").value;
+      const res = await fetch(`${baseUrl}/${id}/alumnos`);
+      const data = await res.json();
+      document.getElementById("resultadoGet1").textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function verEscuelaAlumnos() {
+      const id = document.getElementById("profesorIdGet2").value;
+      const res = await fetch(`${baseUrl}/${id}/escuela-alumnos`);
+      const data = await res.json();
+      document.getElementById("resultadoGet2").textContent = JSON.stringify(data, null, 2);
+    }
+    </script>
+</body>
+</html>

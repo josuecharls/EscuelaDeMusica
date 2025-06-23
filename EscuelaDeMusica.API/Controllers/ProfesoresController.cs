@@ -73,6 +73,7 @@ namespace EscuelaDeMusica.API.Controllers
                 if (await _context.Profesores.AnyAsync(p => p.Identificacion == profesor.Identificacion))
                     return Conflict(new { mensaje = "El número de identificación ya existe." });
 
+                // Usando un procedimiento almacenado para insertar el profesor
                 await _context.Database.ExecuteSqlInterpolatedAsync($"EXEC usp_InsertarProfesor @Nombre={profesor.Nombre}, @Apellido={profesor.Apellido}, @Identificacion={profesor.Identificacion}, @EscuelaId={profesor.EscuelaId}");
 
                 var creado = await _context.Profesores.FirstOrDefaultAsync(p => p.Identificacion == profesor.Identificacion);
@@ -98,7 +99,7 @@ namespace EscuelaDeMusica.API.Controllers
 
                 if (await _context.Profesores.AnyAsync(p => p.Id != id && p.Identificacion == profesor.Identificacion))
                     return Conflict(new { mensaje = "Ya existe otro profesor con esa identificación." });
-
+                // Usando un procedimiento almacenado para actualizar el profesor
                 await _context.Database.ExecuteSqlInterpolatedAsync($"EXEC usp_ActualizarProfesor @Id={id}, @Nombre={profesor.Nombre}, @Apellido={profesor.Apellido}, @Identificacion={profesor.Identificacion}, @EscuelaId={profesor.EscuelaId}");
 
                 return NoContent();
