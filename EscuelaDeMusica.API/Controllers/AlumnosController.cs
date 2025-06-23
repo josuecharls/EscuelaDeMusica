@@ -17,7 +17,7 @@ public class AlumnosController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Alumno>>> GetAlumnos()
+    public async Task<ActionResult<IEnumerable<Alumno>>> ListarAlumnos()
     {
         var alumnos = await _context.Alumnos
                 .FromSqlRaw("EXEC usp_ListarAlumnos")
@@ -33,7 +33,7 @@ public class AlumnosController : ControllerBase
         return alumnos;
     }
     [HttpGet("{id}")]
-    public async Task<ActionResult<AlumnoDetalleDTO>> GetAlumno(int id)
+    public async Task<ActionResult<AlumnoDetalleDTO>> AlumnoPorID(int id)
     {
         var alumno = await _context.Alumnos
             .Include(a => a.Escuela)
@@ -57,7 +57,7 @@ public class AlumnosController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Alumno>> CreateAlumno(Alumno alumno)
+    public async Task<ActionResult<Alumno>> InsertarAlumno(Alumno alumno)
     {
         if (await _context.Alumnos.AnyAsync(a => a.Identificacion == alumno.Identificacion))
             return Conflict("La identificación ya existe");
@@ -65,11 +65,11 @@ public class AlumnosController : ControllerBase
         await _context.Database.ExecuteSqlInterpolatedAsync($"EXEC usp_InsertarAlumno @Nombre={alumno.Nombre}, @Apellido={alumno.Apellido}, @FechaNacimiento={alumno.FechaNacimiento.ToDateTime(TimeOnly.MinValue)}, @Identificacion={alumno.Identificacion}, @EscuelaId={alumno.EscuelaId}");
 
         var creado = await _context.Alumnos.FirstOrDefaultAsync(a => a.Identificacion == alumno.Identificacion);
-        return CreatedAtAction(nameof(GetAlumno), new { id = creado!.Id }, creado);
+        return CreatedAtAction(nameof(AlumnoPorID), new { id = creado!.Id }, creado);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAlumno(int id, Alumno alumno)
+    public async Task<IActionResult> EditarAlumno(int id, Alumno alumno)
     {
         if (!await _context.Alumnos.AnyAsync(a => a.Id == id))
             return NotFound();
@@ -82,7 +82,7 @@ public class AlumnosController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAlumno(int id)
+    public async Task<IActionResult> EliminarAlumno(int id)
     {
         if (!await _context.Alumnos.AnyAsync(a => a.Id == id))
             return NotFound();

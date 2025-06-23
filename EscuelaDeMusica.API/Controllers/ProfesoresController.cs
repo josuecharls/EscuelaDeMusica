@@ -26,7 +26,6 @@ namespace EscuelaDeMusica.API.Controllers
                 .AsNoTracking()
                 .ToListAsync();
 
-            // Cargar manualmente la relación (opcional si necesitas la escuela)
             foreach (var profe in profesores)
             {
                 profe.Escuela = await _context.Escuelas.FindAsync(profe.EscuelaId);
@@ -135,12 +134,22 @@ namespace EscuelaDeMusica.API.Controllers
             if (profesor == null)
                 return NotFound(new { mensaje = "Profesor no encontrado." });
 
-            var alumnos = await _context.Alumnos.Where(a => alumnoIds.Contains(a.Id)).ToListAsync();
+            var alumnos = await _context.Alumnos
+                .Where(a => alumnoIds.Contains(a.Id))
+                .ToListAsync();
+
+            if (alumnos.Count != alumnoIds.Count)
+                return BadRequest(new { mensaje = "Uno o más alumnos no existen." });
+
+            if (alumnos.Any(a => a.EscuelaId != profesor.EscuelaId))
+                return BadRequest(new { mensaje = "Todos los alumnos deben pertenecer a la misma escuela que el profesor." });
+
             foreach (var alumno in alumnos)
             {
                 if (!profesor.Alumnos.Any(a => a.Id == alumno.Id))
                     profesor.Alumnos.Add(alumno);
             }
+
             await _context.SaveChangesAsync();
 
             return NoContent();

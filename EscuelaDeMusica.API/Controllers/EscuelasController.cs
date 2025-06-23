@@ -17,13 +17,13 @@ namespace EscuelaDeMusica.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Escuela>>> GetEscuelas()
+        public async Task<ActionResult<IEnumerable<Escuela>>> ListarEscuelas()
         {
             return await _context.Escuelas.ToListAsync();
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<EscuelaDetalleDTO>> GetEscuela(int id)
+        public async Task<ActionResult<EscuelaDetalleDTO>> EscuelaPorId(int id)
         {
             var escuela = await _context.Escuelas
                 .Include(e => e.Alumnos)
@@ -59,7 +59,7 @@ namespace EscuelaDeMusica.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Escuela>> CreateEscuela(Escuela escuela)
+        public async Task<ActionResult<Escuela>> InsertarEscuela(Escuela escuela)
         {
             if (await _context.Escuelas.AnyAsync(e => e.Codigo == escuela.Codigo))
             {
@@ -67,19 +67,17 @@ namespace EscuelaDeMusica.API.Controllers
             }
             _context.Escuelas.Add(escuela);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetEscuela), new { id = escuela.Id }, escuela);
+            return CreatedAtAction(nameof(EscuelaPorId), new { id = escuela.Id }, escuela);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateEscuela(int id, Escuela escuela)
+        public async Task<IActionResult> EditarEscuela(int id, Escuela escuela)
         {
             var escuelaExistente = await _context.Escuelas.FindAsync(id);
             if (escuelaExistente == null) return NotFound();
 
-            // Asignar el ID al objeto recibido (por seguridad)
             escuela.Id = id;
 
-            // Validar código único
             if (await _context.Escuelas.AnyAsync(e => e.Id != id && e.Codigo == escuela.Codigo))
                 return Conflict("Ya existe otra escuela con ese código.");
 
@@ -90,7 +88,7 @@ namespace EscuelaDeMusica.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEscuela(int id)
+        public async Task<IActionResult> EliminarEscuela(int id)
         {
             var escuela = await _context.Escuelas.FindAsync(id);
             if (escuela == null)
